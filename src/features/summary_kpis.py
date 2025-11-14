@@ -1,57 +1,100 @@
 # File: src/features/summary_kpis.py
 import pandas as pd
+from pprint import pprint # Used for pretty-printing in our test block
 
-def get_summary_kpis(df: pd.DataFrame) -> dict:
+def get_summary_kpis(df: pd.DataFrame, start_date: pd.Timestamp, end_date: pd.Timestamp) -> dict:
     """
-    Calculates the main summary KPIs from the transaction data.
+    Calculates main summary KPIs, both overall and broken down
+    by transaction type ('credit', 'debit', 'transfer') for a 
+    specific date range.
     
     Args:
         df: The cleaned financial transactions DataFrame.
-        
+        start_date: The start of the date range (inclusive).
+        end_date: The end of the date range (inclusive).
+            
     Returns:
-        A dictionary containing the summary KPIs.
+        A nested dictionary containing KPIs for 'overall' and each type.
     """
     
-    # 1. Calculate Total Amount
-    total_amount = df['amount'].sum()
+    # 1. Filter the DataFrame based on the user-selected date range
+    mask = (df['date'] >= start_date) & (df['date'] <= end_date)
+    filtered_df = df.loc[mask]
     
-    # 2. Calculate Total Transactions
-    total_transactions = len(df)
-    
-    # 3. Calculate Average Transaction
-    avg_transaction = df['amount'].mean()
-    
-    # 4. Return as a dictionary (as per Acceptance Criteria)
-    kpi_dict = {
-        "total_amount": total_amount,
-        "total_transactions": total_transactions,
-        "avg_transaction": avg_transaction
+    # 2. Handle the case where the filter results in no data
+    if filtered_df.empty:
+        # Return a zero-filled structure
+        empty_kpis = {"total_amount": 0, "total_transactions": 0, "avg_transaction": 0}
+        return {
+            "overall": empty_kpis,
+            "credit": empty_kpis,
+            "debit": empty_kpis,
+            "transfer": empty_kpis
+        }
+
+    # 3. Calculate "Overall" KPIs (on the filtered data)
+    overall_kpis = {
+        "total_amount": filtered_df['amount'].sum(),
+        "total_transactions": len(filtered_df),
+        "avg_transaction": filtered_df['amount'].mean()
     }
     
-    return kpi_dict
+    # 4. Calculate KPIs by Type
+    grouped_by_type = filtered_df.groupby('type')['amount']
+    type_sum = grouped_by_type.sum()
+    type_count = grouped_by_type.count()
+    type_mean = grouped_by_type.mean()
 
-# --- Bloque de prueba (Opcional pero recomendado) ---
-# Esto te permite probar tu función antes de que el dashboard exista.
-# Solo se ejecutará si corres este archivo directamente: python src/features/summary_kpis.py
+    # 5. Build the final nested dictionary result
+    # We use .get(key, 0) to prevent errors if a type has 0 transactions
+    results = {
+        "overall": overall_kpis,
+        "credit": {
+            "total_amount": type_sum.get('credit', 0),
+            "total_transactions": type_count.get('credit', 0),
+            "avg_transaction": type_mean.get('credit', 0)
+        },
+        "debit": {
+            "total_amount": type_sum.get('debit', 0),
+            "total_transactions": type_count.get('debit', 0),
+            "avg_transaction": type_mean.get('debit', 0)
+        },
+        "transfer": {
+            "total_amount": type_sum.get('transfer', 0),
+            "total_transactions": type_count.get('transfer', 0),
+            "avg_transaction": type_mean.get('transfer', 0)
+        }
+    }
+    
+    return results
+
+# --- Updated Test Block ---
+# Now it's even more important, to test your new nested structure
 if __name__ == "__main__":
     
-    # Importar el data loader para probar
-    # Nota: Estamos subiendo un nivel (..) para encontrar src/data_loader.py
     import sys
     import os
     
-    # Esta magia nos permite importar desde la carpeta 'src'
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from data_loader import load_data
+    # Find the project root to import other modules
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.append(project_root)
     
-    # Carga los datos (asegúrate de que el CSV esté en tu carpeta 'data')
-    df = load_data('data/financial_transactions.csv')
+    from src.data_loader import load_data
+    
+    DATA_PATH = "data/financial_transactions.csv"
+    df = load_data(DATA_PATH)
     
     if not df.empty:
-        # Prueba tu función de KPI
-        kpis = get_summary_kpis(df)
-        print("--- Testing KPI Function ---")
-        print(kpis)
-        print("----------------------------")
+        # --- Test 1: Full Date Range ---
+        print("--- 🚀 Testing Full Range 🚀 ---")
+        min_date = df['date'].min()
+        max_date = df['date'].max()
+        
+        kpis_full = get_summary_kpis(df, min_date, max_date)
+        
+        # Use Pretty Print to show the nested dictionary
+        pprint(kpis_full)
+        
+        print("--------------------------------------")
     else:
-        print("Could not load data for testing.")
+        print("Error: Could not load data for testing.")

@@ -4,9 +4,52 @@
 
 This project is a strategic financial analysis dashboard built by our 4-person student team (Group 5, Homework 2). It ingests a CSV of financial transactions and presents a one-page, interactive web dashboard for business stakeholders.
 
-The application is built with **Python**, **Streamlit**, and **Pandas**.
+The application is built with **Python**, **matplotlib**, **Streamlit**, and **Pandas**.
 
 The project is managed using a 2-sprint Scrum methodology and a feature-branch Git workflow. All code, comments, and documentation are in English.
+
+
+🚀 How to Run This Project
+
+To run this dashboard locally, you only need to follow 3 steps.
+
+1. Get the Code
+
+Clone this repository to your local machine:
+
+git clone [https://github.com/eriquew1179/G5-H2-Financial-Analytics-App.git](https://github.com/eriquew1179/G5-H2-Financial-Analytics-App.git)
+cd G5-H2-Financial-Analytics-App
+
+## Project Setup & Installation
+2. Set Up Your Environment
+
+This will create a virtual environment and install all the necessary packages from requirements.txt.
+# Create the environment
+python -m venv venv
+
+# Activate on Windows (PowerShell/CMD)
+.\venv\Scripts\activate
+
+# Activate on macOS/Linux
+# source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+**Add the data:**
+    This project uses `financial_transactions.csv`. Due to its size, it is *not* tracked by Git. You must **place your local copy** of `financial_transactions.csv` inside the `/data/` folder.
+
+## Run the Dashboard
+3. Run the Dashboard
+
+Before running, place your financial_transactions.csv file inside the /data/ folder.
+
+Once the file is in place, run the following command:
+
+streamlit run app.py
+
+
+Streamlit will open the application in your default web browser.
 
 ## Features
 
@@ -18,46 +61,23 @@ Based on our defined User Stories, the dashboard will deliver the following stra
 * **US-4: Temporal Trend Analysis:** A line chart showing total transaction value by month to identify seasonal trends and growth.
 * **US-5: Top Client Analysis:** A table identifying the Top 10 most valuable customers by total spending.
 
-## Project Setup & Installation
+## dashboard Features
 
-Follow these steps to set up your local development environment.
+The final dashboard integrates all 6 of our project's User Stories:
 
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/eriquew1179/G5-H2-Financial-Analytics-App.git
-    cd G5-H2-Financial-Analytics-App
-    ```
+- Interactive Date-Range Filter: All metrics and charts are fully interactive and update based on the date range selected in the sidebar.
 
-2.  **Create and activate a virtual environment:**
-    ```bash
-    # Create the environment
-    python -m venv venv
-    
-    # Activate on Windows (PowerShell/CMD)
-    .\venv\Scripts\activate
-    
-    # Activate on macOS/Linux
-    # source venv/bin/activate
-    ```
+- KPI Summary Cards (US-2): "At-a-glance" cards for overall performance, as well as a breakdown by Inflow (Credit), Outflow (Debit), and Transfers.
 
-3.  **Install dependencies:**
-    All required packages are listed in `requirements.txt`.
-    ```bash
-    pip install -r requirements.txt
-    ```
+- Net Cash Flow Chart (US-1): A monthly area chart that visualizes the "Inflow vs. Outflow" battle, allowing managers to monitor liquidity.
 
-4.  **Add the data:**
-    This project uses `financial_transactions.csv`. Due to its size, it is *not* tracked by Git. You must **place your local copy** of `financial_transactions.csv` inside the `/data/` folder.
+- Temporal Trend Chart (US-5): A line chart showing the total transaction amount over time to identify growth and seasonality.
 
-## How to Run the Application
+- Transaction Type Chart (US-3): A bar chart that shows the total value and volume for each transaction type.
 
-Once your environment is set up and the data file is in place, run the following command from the root directory:
+- Top N Clients Table (US-4): An interactive table and chart showing the most valuable customers, with a slider to select the Top 'N' clients.
 
-```bash
-streamlit run app.py
-```
 
-Streamlit will open the application in your default web browser.
 
 ## Project Architecture
 
